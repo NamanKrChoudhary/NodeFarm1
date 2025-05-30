@@ -23,6 +23,8 @@ const tempCardFiller = (template, data) => {
   curr = curr.replace(/{%PRICE%}/g, data.price);
   curr = curr.replace(/{%AMOUNT%}/g, data.quantity);
   curr = curr.replace(/{%ID%}/g, data.id);
+  curr = curr.replace(/{%NUTRIENTS%}/g, data.nutrients);
+  curr = curr.replace(/{%FROM%}/g, data.from);
 
   if (!data.organic) {
     curr = curr.replace(/{%NOT-ORGANIC%}/g, "not-organic");
@@ -35,13 +37,16 @@ const rawdata = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
 const prodData = JSON.parse(rawdata);
 
 const server = http.createServer((req, res) => {
-  const pathName = req.url;
+  const pathname = req.url;
 
-  if (pathName === "/" || pathName === "/overview") {
+  if (pathname === "/" || pathname === "/overview") {
+    res.writeHead(200, { "content-type": "text/html" });
+
     const cardsArr = prodData.map((card) => tempCardFiller(cardTemplate, card));
     console.log(cardsArr);
     let currover = overTemplate.replace(/{%OVER-CARDS%}/g, cardsArr);
     res.end(currover);
+  } else if (pathname === "/product") {
   } else {
     res.writeHead(404, { "Content-type": "text/html" });
     res.end("Page not found!");
